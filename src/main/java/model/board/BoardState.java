@@ -7,7 +7,7 @@ public class BoardState {
     private final CellState[][] playground;
 
     public BoardState(CellState[][] playground) {
-        // Deep copy để tránh bị sửa ngoài ý muốn
+
         int w = playground.length;
         int h = playground[0].length;
         this.playground = new CellState[w][h];
@@ -20,5 +20,4 @@ public class BoardState {
         return playground;
     }
 
-    // Có thể mở rộng thêm các trạng thái khác nếu cần
 }

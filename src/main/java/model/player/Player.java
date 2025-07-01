@@ -85,4 +85,13 @@ public class Player implements IPlayer {
 
     // (Optional) Getter cho name
     public String getName() { return name; }
+
+    public PlayerState getState() {
+        return new PlayerState(
+                lifePoint,
+                hand.getCards(),
+                deck != null ? deck.getCardCount() : 0,
+                grave.getCards()
+        );
+    }
 }

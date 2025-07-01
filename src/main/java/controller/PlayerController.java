@@ -16,8 +16,6 @@ public class PlayerController implements IPlayerController {
 
     @Override
     public void onPlayerAction(IAction action) {
-        // TODO: Xử lý action của người chơi (rút, đặt, kích hoạt effect,...)
-        // player.performAction(action);
         notifyPlayerStateChanged();
     }
 
@@ -28,7 +26,6 @@ public class PlayerController implements IPlayerController {
                 player.getHand().getCards(),
                 player.getDeck().getCardCount(),
                 player.getGrave().getCards()
-                // ... các trường khác nếu có
         );
     }
 

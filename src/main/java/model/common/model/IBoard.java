@@ -2,6 +2,7 @@ package model.common.model;
 
 import listener.IBoardListener;
 import model.board.CellState;
+import model.board.BoardState;
 
 public interface IBoard {
     // Lấy trạng thái tổng thể của sân (ma trận các ô)
@@ -24,4 +25,6 @@ public interface IBoard {
 
     // Lắng nghe sự kiện thao tác từ View/UI
     void setBoardListener(IBoardListener listener);
+
+    BoardState getState();
 }

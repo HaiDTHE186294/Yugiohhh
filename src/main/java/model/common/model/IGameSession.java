@@ -19,4 +19,7 @@ public interface IGameSession {
 
     // Lắng nghe sự kiện thay đổi trạng thái (cho View)
     void setGameSessionListener(IGameSessionListener listener);
+
+    // Lấy trạng thái tổng thể của session
+    model.gamesession.GameSessionState getCurrentState();
 }

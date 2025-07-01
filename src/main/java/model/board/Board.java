@@ -70,4 +70,8 @@ public class Board implements IBoard {
     public void setBoardListener(IBoardListener listener) {
         this.boardListener = listener;
     }
+
+    public BoardState getState() {
+        return new BoardState(playground);
+    }
 }

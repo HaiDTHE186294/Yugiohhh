@@ -12,6 +12,8 @@ import model.common.model.IDeck;
 import model.common.model.ICard;
 import model.card.Grave;
 import view.GameMainFrame;
+import model.gamesession.GameSession;
+import model.common.model.IGameSession;
 
 import java.util.*;
 
@@ -52,16 +54,15 @@ public class Main {
             graves.put(i, players.get(i).getGrave());
         }
 
-        Board board = new Board(5, 5, players.size(), decks, graves);
+        Board board = new Board(10, 4, players.size(), decks, graves);
 
-        // Khởi tạo controller
-        BoardController boardController = new BoardController(board);
-        PlayerController player1Controller = new PlayerController(player1);
-        // Nếu muốn chơi 2 người thì cần thêm PlayerController cho player2
+        // Khởi tạo GameSession (state pattern)
+        IGameSession gameSession = new GameSession(player1, player2, board);
+        gameSession.start();
 
         // Khởi tạo view
         javax.swing.SwingUtilities.invokeLater(() -> {
-            new GameMainFrame(boardController, player1Controller);
+            new GameMainFrame(gameSession);
         });
     }
 }
