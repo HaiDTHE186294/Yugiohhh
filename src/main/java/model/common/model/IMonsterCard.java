@@ -1,7 +1,6 @@
-package model.card;
+package model.common.model;
 import model.common.DTO.AttackResult;
 import model.common.constaint.MonsterType;
-import model.common.model.ICard;
 
 public interface IMonsterCard extends ICard {
     int getAtk();

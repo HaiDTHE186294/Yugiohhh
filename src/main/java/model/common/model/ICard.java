@@ -1,5 +1,6 @@
 package model.common.model;
 
+import model.common.DTO.CardDetail;
 import model.common.constaint.CardType;
 
 import java.awt.*;
@@ -12,4 +13,6 @@ public interface ICard {
 
     void setFaceUp(boolean faceUp);
     boolean isFaceUp();
+
+    CardDetail getCardDetail();
 }

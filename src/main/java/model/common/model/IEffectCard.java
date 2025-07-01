@@ -1,6 +1,4 @@
-package model.card;
-import model.common.model.ICard;
-import model.common.model.ITarget;
+package model.common.model;
 
 public interface IEffectCard extends ICard {
     // Kích hoạt hiệu ứng

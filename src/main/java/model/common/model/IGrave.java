@@ -5,5 +5,5 @@ import java.util.List;
 public interface IGrave {
     void addCard(ICard card);
     ICard getLastCard();
-    List<ICard> getAllCards();
+    List<ICard> getCards();
 }
