@@ -1,190 +1,97 @@
 package view;
 
-import controller.IBoardController;
-import controller.IPlayerController;
-import listener.IBoardStateListener;
-import listener.IPlayerStateListener;
-import model.board.BoardState;
-import model.common.constaint.ActionType;
+import model.common.model.ICard;
+import model.gamesession.CardAction;
 import model.player.PlayerState;
+import model.gamesession.GameSessionState;
 import model.common.model.IGameSession;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.List;
 
-// Main game window
-public class GameMainFrame extends JFrame implements IBoardStateListener, IPlayerStateListener {
+public class GameMainFrame extends JFrame {
+    private BoardPanel boardPanel;
+    private HandPanel handPanel;
+    private InfoPanel infoPanel;
     private IGameSession gameSession;
-
-    private JPanel boardPanel;
-    private JPanel handPanel;
-    private JButton deckButton;
-    private JButton graveButton;
-    private JLabel lifePointLabel;
-    private JButton endTurnButton;
     private int selectedHandCardIndex = -1;
-    private JLabel phaseLabel, currentPlayerLabel;
+    private DeckView deckView;
+    private GraveView graveView;
 
     public GameMainFrame(IGameSession gameSession) {
         this.gameSession = gameSession;
-
         setTitle("Card Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Board
-        int width = 10, height = 4;
-        boardPanel = new JPanel(new GridLayout(height, width));
-        for (int i = 0; i < width * height; i++) {
-            JButton cellBtn = new JButton();
-            final int cellIdx = i;
-            cellBtn.addActionListener(e -> onBoardCellClicked(cellIdx));
-            boardPanel.add(cellBtn);
-        }
+        boardPanel = new BoardPanel(5, 4);
+        handPanel = new HandPanel();
+        deckView = new DeckView();
+        graveView = new GraveView();
+        infoPanel = new InfoPanel();
+        JPanel sidePanel = new JPanel(new GridLayout(2, 1));
+        sidePanel.add(deckView);
+        sidePanel.add(graveView);
+
+        add(sidePanel, BorderLayout.EAST);
         add(boardPanel, BorderLayout.CENTER);
-
-        // Hand
-        handPanel = new JPanel(new FlowLayout());
         add(handPanel, BorderLayout.SOUTH);
+        add(infoPanel, BorderLayout.NORTH);
 
-        // Deck & Grave
-        JPanel deckGravePanel = new JPanel();
-        deckButton = new JButton("Deck");
-        deckGravePanel.add(deckButton);
-
-        graveButton = new JButton("Grave");
-        deckGravePanel.add(graveButton);
-
-        lifePointLabel = new JLabel("Life: 8000");
-        deckGravePanel.add(lifePointLabel);
-
-        phaseLabel = new JLabel();
-        currentPlayerLabel = new JLabel();
-        deckGravePanel.add(phaseLabel);
-        deckGravePanel.add(currentPlayerLabel);
-
-        // Nút kết thúc lượt
-        endTurnButton = new JButton("Kết thúc lượt");
-        endTurnButton.addActionListener(e -> {
+        // Lắng nghe thao tác
+        boardPanel.addCellListener(this::onBoardCellClicked);
+        handPanel.addCardListener(this::onHandCardClicked);
+        infoPanel.addEndTurnListener(e -> {
             gameSession.nextPhase();
-            model.gamesession.GameSessionState sessionState = gameSession.getCurrentState();
-            if (sessionState != null && sessionState.getBoardState() != null) {
-                updateBoard(sessionState.getBoardState());
-            }
-            int currentIdx = sessionState.getCurrentPlayerIndex();
-            if (currentIdx == 0 && sessionState.getPlayer1State() != null) {
-                updatePlayer(sessionState.getPlayer1State());
-            } else if (currentIdx == 1 && sessionState.getPlayer2State() != null) {
-                updatePlayer(sessionState.getPlayer2State());
-            }
-            updatePhaseAndPlayerLabel(sessionState);
+            updateFromSession();
         });
-        deckGravePanel.add(endTurnButton);
 
-        add(deckGravePanel, BorderLayout.NORTH);
+        // Update UI lần đầu
+        updateFromSession();
 
-        setSize(800, 600);
+        setSize(900, 650);
         setVisible(true);
-
-        // TODO: Đăng ký listener với gameSession nếu cần
-        // Lấy trạng thái ban đầu từ gameSession để update UI
-        model.gamesession.GameSessionState sessionState = gameSession.getCurrentState();
-        if (sessionState != null && sessionState.getBoardState() != null) {
-            updateBoard(sessionState.getBoardState());
-        }
-        if (sessionState != null && sessionState.getPlayer1State() != null) {
-            updatePlayer(sessionState.getPlayer1State());
-        }
-        updatePhaseAndPlayerLabel(sessionState);
     }
 
-    // Khi click 1 ô trên bàn
-    private void onBoardCellClicked(int cellIdx) {
-        int x = cellIdx % 10;
-        int y = cellIdx / 10;
-        model.gamesession.GameSessionState sessionState = gameSession.getCurrentState();
-        int currentIdx = sessionState.getCurrentPlayerIndex();
+    private void updateFromSession() {
+        GameSessionState sessionState = gameSession.getCurrentState();
+        boardPanel.setState(sessionState.getBoardState());
+        PlayerState playerState = sessionState.getCurrentPlayerIndex() == 0
+                ? sessionState.getPlayer1State()
+                : sessionState.getPlayer2State();
+        handPanel.setHandState(playerState);
+        infoPanel.setPhase(sessionState.getCurrentPhase().getPhaseType().toString());
+        infoPanel.setPlayer("Player " + (sessionState.getCurrentPlayerIndex() + 1));
+        infoPanel.setLife(playerState.getLifePoint());
+        deckView.setDeckState(playerState.getDeckCount());
+        List<ICard> graveCards = playerState.getGraveCards();
+        graveView.setGraveState(
+                graveCards.isEmpty() ? null : graveCards.get(graveCards.size()-1).getName()
+        );
+    }
+
+    private void onBoardCellClicked(int x, int y) {
+        var sessionState = gameSession.getCurrentState();
+        var playerState = sessionState.getCurrentPlayerIndex() == 0
+                ? sessionState.getPlayer1State()
+                : sessionState.getPlayer2State();
+
         if (selectedHandCardIndex != -1) {
-            PlayerState playerState = (currentIdx == 0) ? sessionState.getPlayer1State() : sessionState.getPlayer2State();
-            model.common.model.ICard card = playerState.getHandCards().get(selectedHandCardIndex);
-            model.gamesession.SummonAction action = new model.gamesession.SummonAction(currentIdx, card, x, y);
+            var card = playerState.getHandCards().get(selectedHandCardIndex);
+            //Đóng gói thao tác để gửi đến game session
+            var action = new CardAction(sessionState.getCurrentPlayerIndex(), card, x, y);
             gameSession.handleAction(action);
-
-            // Cập nhật lại UI
-            sessionState = gameSession.getCurrentState();
-            updateBoard(sessionState.getBoardState());
-            if (currentIdx == 0) updatePlayer(sessionState.getPlayer1State());
-            else updatePlayer(sessionState.getPlayer2State());
-            updatePhaseAndPlayerLabel(sessionState);
-
             selectedHandCardIndex = -1;
+        } else {
+            var action = new CardAction(sessionState.getCurrentPlayerIndex(), null, x, y);
+            gameSession.handleAction(action);
         }
+
+        updateFromSession();
     }
 
-    @Override
-    public void onBoardStateChanged(BoardState state) {
-        updateBoard(state);
-    }
-
-    @Override
-    public void onPlayerStateChanged(PlayerState state) {
-        // Cập nhật handPanel, lifePointLabel, v.v.
-        handPanel.removeAll();
-        for (int i = 0; i < state.getHandCards().size(); i++) {
-            JButton cardBtn = new JButton(state.getHandCards().get(i).getName());
-            final int cardIdx = i;
-            cardBtn.addActionListener(e -> {
-                selectedHandCardIndex = cardIdx; // Lưu lại lá bài được chọn
-            });
-            handPanel.add(cardBtn);
-        }
-        lifePointLabel.setText("Life: " + state.getLifePoint());
-        handPanel.revalidate();
-        handPanel.repaint();
-    }
-
-    private void updateBoard(BoardState state) {
-        if (state == null) return;
-        model.board.CellState[][] playground = state.getPlayground();
-        int w = playground.length;
-        int h = playground[0].length;
-        for (int y = 0; y < h; ++y) {
-            for (int x = 0; x < w; ++x) {
-                int idx = y * w + x;
-                if (idx < boardPanel.getComponentCount()) {
-                    JButton btn = (JButton) boardPanel.getComponent(idx);
-                    model.common.model.ICard card = playground[x][y].getCard();
-                    if (card != null) {
-                        btn.setText(card.getName());
-                    } else {
-                        btn.setText("");
-                    }
-                }
-            }
-        }
-    }
-
-    private void updatePlayer(PlayerState state) {
-        handPanel.removeAll();
-        for (int i = 0; i < state.getHandCards().size(); i++) {
-            JButton cardBtn = new JButton(state.getHandCards().get(i).getName());
-            final int cardIdx = i;
-            cardBtn.addActionListener(e -> {
-                selectedHandCardIndex = cardIdx; // Lưu lại lá bài được chọn
-            });
-            handPanel.add(cardBtn);
-        }
-        lifePointLabel.setText("Life: " + state.getLifePoint());
-        handPanel.revalidate();
-        handPanel.repaint();
-    }
-
-    private void updatePhaseAndPlayerLabel(model.gamesession.GameSessionState sessionState) {
-        if (sessionState == null) return;
-        phaseLabel.setText("Phase: " + sessionState.getCurrentPhase().getPhaseType());
-        int idx = sessionState.getCurrentPlayerIndex();
-        currentPlayerLabel.setText("Lượt: " + (idx == 0 ? "Player 1" : "Player 2"));
+    private void onHandCardClicked(int idx) {
+        selectedHandCardIndex = idx;
     }
 }

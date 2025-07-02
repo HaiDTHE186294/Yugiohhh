@@ -15,8 +15,18 @@ public class StandbyPhase implements IPhase {
 
     @Override
     public void onAction(IAction action, IGameSession session) {
-        // Thường không có action đặc biệt ở Standby Phase
-    }
+        if (action instanceof CardAction) {
+            CardAction cardAction = (CardAction) action;
+                IPlayer player = session.getCurrentPlayer();
+                ICard card = cardAction.getCard();
+                if (player.getHand().getCards().contains(card)
+                        && card.getType() == model.common.constaint.CardType.SPELL) {
+                    player.getHand().removeCard(card);
+                    System.out.println("Active Spell Card: " + card.getName());
+                }
+            }
+        }
+
 
     @Override
     public void onExit(IGameSession session) { }

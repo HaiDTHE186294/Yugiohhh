@@ -54,7 +54,7 @@ public class Main {
             graves.put(i, players.get(i).getGrave());
         }
 
-        Board board = new Board(10, 4, players.size(), decks, graves);
+        Board board = new Board(5, 4, players.size(), decks, graves);
 
         // Khởi tạo GameSession (state pattern)
         IGameSession gameSession = new GameSession(player1, player2, board);

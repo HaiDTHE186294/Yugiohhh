@@ -10,5 +10,4 @@ public class AttackResult {
     public AttackResult(boolean attackerDestroyed, boolean defenderDestroyed, int abs) {
     }
 
-    // Constructor, getters, setters...
 }

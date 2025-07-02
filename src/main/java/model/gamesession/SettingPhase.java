@@ -1,8 +1,8 @@
 package model.gamesession;
 
+import model.common.constaint.CardType;
 import model.common.constaint.PhaseType;
 import model.common.model.*;
-import model.gamesession.SummonAction;
 
 public class SettingPhase implements IPhase {
     @Override
@@ -16,11 +16,12 @@ public class SettingPhase implements IPhase {
 
     @Override
     public void onAction(IAction action, IGameSession session) {
-        if (action instanceof SummonAction) {
-            SummonAction summon = (SummonAction) action;
+        if (action instanceof CardAction) {
+            CardAction summon = (CardAction) action;
             int playerId = summon.getPlayerId();
             int x = summon.getX();
             int y = summon.getY();
+            System.out.println("SummonAction: playerId=" + playerId + ", card=" + summon.getCard().getName() + ", x=" + x + ", y=" + y);
 
             // Kiểm tra vùng hợp lệ cho từng player
             boolean valid = false;
@@ -32,17 +33,17 @@ public class SettingPhase implements IPhase {
             if (!valid) return; // Không hợp lệ thì bỏ qua
 
             // Kiểm tra loại bài và hàng
-            model.common.model.ICard card = summon.getCard();
-            model.common.constaint.CardType type = card.getType();
+            ICard card = summon.getCard();
+            CardType type = card.getType();
             if (type == model.common.constaint.CardType.SPELL && !(y == 1 || y == 2)) return;
             if (type == model.common.constaint.CardType.MONSTER && !(y == 0 || y == 3)) return;
 
             IPlayer player = session.getCurrentPlayer();
             if (player.getHand().getCards().contains(card)) {
                 boolean ok = player.summonMonster(card, x, y, true);
-                if (ok && session instanceof model.gamesession.GameSession) {
-                    model.gamesession.GameSession gs = (model.gamesession.GameSession) session;
+                if (ok && session instanceof GameSession gs) {
                     gs.getBoard().placeCard(playerId, x, y, card, true);
+                    System.out.println("valid=" + valid);
                 }
             }
         }

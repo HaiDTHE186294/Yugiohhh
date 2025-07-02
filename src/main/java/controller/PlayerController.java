@@ -31,7 +31,6 @@ public class PlayerController implements IPlayerController {
 
     @Override
     public void onPhaseChanged(IPhase newPhase) {
-        // TODO: Cập nhật trạng thái khi phase mới, reset hành động nếu cần
         notifyPlayerStateChanged();
     }
 

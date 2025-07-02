@@ -29,7 +29,6 @@ public class GameSession implements IGameSession {
     @Override
     public void nextPhase() {
         currentPhase.onExit(this);
-        // Chuyển phase tiếp theo (ví dụ: DRAW -> STANDBY -> ...), code mẫu
         switch (currentPhase.getPhaseType()) {
             case DRAW: currentPhase = new StandbyPhase(); break;
             case STANDBY: currentPhase = new SettingPhase(); break;

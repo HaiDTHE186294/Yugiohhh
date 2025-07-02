@@ -2,12 +2,13 @@ package model.gamesession;
 
 import model.common.model.IAction;
 import model.common.model.ICard;
+import model.common.constaint.ActionType;
 
-public class SummonAction implements IAction {
+public class CardAction implements IAction {
     private int playerId;
     private ICard card;
     private int x, y;
-    public SummonAction(int playerId, ICard card, int x, int y) {
+    public CardAction(int playerId, ICard card, int x, int y) {
         this.playerId = playerId;
         this.card = card;
         this.x = x;
@@ -18,8 +19,9 @@ public class SummonAction implements IAction {
     public int getX() { return x; }
     public int getY() { return y; }
     @Override
-    public model.common.constaint.ActionType getType() {
-        return model.common.constaint.ActionType.SUMMON;
+    public ActionType getType() {
+        return ActionType.SUMMON;
+        //Thực ra là SUMMON với kích hoạt Spell, vì đang giống nhau, Tấn công thì cần Action khác
     }
     @Override
     public Object getData() {

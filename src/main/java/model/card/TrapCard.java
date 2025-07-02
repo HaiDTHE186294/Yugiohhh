@@ -9,18 +9,18 @@ import java.util.List;
 import model.common.model.IEffect;
 import model.gamesession.GameContext;
 
-public class SpellCard implements IEffectCard {
+public class TrapCard implements IEffectCard {
     private String name;
     private boolean faceUp;
     private List<IEffect> effects;
 
-    public SpellCard(String name, List<IEffect> effects) {
+    public TrapCard(String name, List<IEffect> effects) {
         this.name = name;
         this.effects = effects;
         this.faceUp = false;
     }
 
-    public SpellCard(String name) {
+    public TrapCard(String name) {
         this.name = name;
     }
 
@@ -34,8 +34,9 @@ public class SpellCard implements IEffectCard {
 
     @Override
     public boolean canActivate(GameContext context) {
-        return true;
+        return context != null && context.isBeingAttacked();
     }
+
 
     @Override
     public String getName() { return name; }

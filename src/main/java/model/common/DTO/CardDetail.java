@@ -35,7 +35,7 @@ public class CardDetail {
     public MonsterType getMonsterType() { return monsterType; }
     public boolean isFaceUp() { return faceUp; }
 
-    // Setter (nếu cần)
+    // Setter
     public void setName(String name) { this.name = name; }
     public void setType(CardType type) { this.type = type; }
     public void setDescription(String description) { this.description = description; }
